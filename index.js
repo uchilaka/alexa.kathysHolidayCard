@@ -67,28 +67,37 @@ function getWelcomeResponse(callback) {
         buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
 }
 
-function readCard(session, callback) {
+function readCard(sessionAttributes, callback) {
     const cardTitle = 'The Card';
-    var sessionAttributes = session.attributes;
     const repromptText = 'Would you like to hear the card again?';
     const shouldEndSession = false;
-    const speechOutput = 'Kathy, you complete me. Will you marry me?';
-    sessionAttributes.proposalHeard = true;
+    const speechOutput = "Hi Kathy, here's a holiday message from Matt: Kathy, I am overjoyed to be consumed with your presence, your thoughtfulness, and your love. I love gazing into your eyes, listening to your every word, completing your sentences, and laughing at our quirky things. Will you take my hand in marriage?";
+    if (sessionAttributes)
+        sessionAttributes.proposalHeard = true;
     callback(sessionAttributes, buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
 }
 
 function handleCardResponse(session, callback) {
     const cardTitle = 'The Response';
     const sessionAttributes = session.attributes;
-    const repromptText = "Kathy - would you like me to read Matt's card again?";
+    const repromptText = "Would you like me to read Matt's card again?";
     const shouldEndSession = false;
     const speechOutput = "So... what do you think?";
     callback(sessionAttributes, buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
 }
 
+function handleUnknownRequest(intent, session, callback, isError) {
+    var sessionAttributes = (session ? session.attributes : {});
+    const cardTitle = 'Unknown Request';
+    const repromptText = 'Try again?';
+    const shouldEndSession = false;
+    const speechOutput = ["Intent detected:", intent.name, '; Session has attributes:', (session && typeof session.attributes === 'object'), '; Error thrown:', isError === true].join(' ');
+    callback(sessionAttributes, buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
+}
+
 function handleSessionEndRequest(session, callback) {
     const cardTitle = 'Session Ended',
-        sessionAttributes = session.attributes
+        sessionAttributes = (session ? session.attributes : {})
         ;
     const speechOutput = sessionAttributes.happyEnding ? 'Compliments of the Season, and Congratulations!!' : 'Goodbye';
     // Setting this to true ends the session and exits the skill.
@@ -124,50 +133,91 @@ function onLaunch(launchRequest, session, callback) {
 function onIntent(intentRequest, session, callback) {
     console.log(`onIntent requestId=${intentRequest.requestId}, sessionId=${session.sessionId}`);
 
-    const intent = intentRequest.intent;
-    const intentName = intentRequest.intent.name;
-    var attributes = session.attributes;
+    const intent = intentRequest.intent
+        , intentName = intentRequest.intent.name
+        , SESSION_EXISTS = (typeof session === 'object')
+        ;
+    var attributes = (SESSION_EXISTS && session.hasOwnProperty('attributes') ? session.attributes : {});
+
+    /*    
+    if (/ReadCardIntent/.test(intentName)) {
+        
+    } else if (/AMAZON\.HelpIntent/.test(intentName)) {
+        
+    } else if (/AMAZON\.YesIntent/.test(intentName)) {
+        
+    } else if (/AMAZON\.NoIntent/.test(intentName)) {
+        
+    } else if (/AMAZON\.(StopIntent|CancelIntent)/.test(intentName)) {
+        
+    }
+    */
 
     switch (intentName) {
         case 'ReadCardIntent':
+            /*
             // set name, if provided 
             var firstName = intent.slots.FirstName.value;
             if (firstName && !/^he|she|they|we$/.test(firstName)) {
                 attributes.firstName = firstName;
             }
-            readCard(session, callback);
-            break;
+            */
+            return readCard(session, callback);
 
         case 'AMAZON.HelpIntent':
-            getWelcomeResponse(callback);
-            break;
+            return getWelcomeResponse(callback);
 
         case 'AMAZON.YesIntent':
-            if (attributes.proposalHeard) {
-                attributes.happyEnding = true;
-                handleSessionEndRequest(session, callback);
-            } else {
-                readCard(session, callback);
+            try {
+                if (attributes.proposalHeard && session) {
+                    attributes.happyEnding = true;
+                    return handleSessionEndRequest(session, callback);
+                } else {
+                    return readCard(attributes, callback);
+                    session.attributes.proposalHeard = true;
+                }
+            } catch (err) {
+                //return handleUnknownRequest(intent, session, callback);
+                return readCard(attributes, callback);
+                session.attributes.proposalHeard = true;
             }
             break;
 
         case 'AMAZON.NoIntent':
-            if (!attributes.proposalHeard) {
-                getWaitingResponse(session, callback);
-            } else {
-                attributes.happyEnding = false;
-                handleSessionEndRequest(session, callback);
+            try {
+                if (!session || !attributes.proposalHeard) {
+                    return getWaitingResponse(session, callback);
+                } else {
+                    attributes.happyEnding = false;
+                    return handleSessionEndRequest(session, callback);
+                }
+            } catch (err) {
+                return handleUnknownRequest(intent, session, callback, true);
             }
             break;
 
-        case 'AMAZON.StopIntent':            
+        case 'AMAZON.StopIntent':
         case 'AMAZON.CancelIntent':
-            handleSessionEndRequest(session, callback);
-            break;
+            return handleSessionEndRequest(session, callback);
 
         default:
-            throw new Error('Invalid intent');
+            return handleUnknownRequest(intent, session, callback);
+        //throw new Error('Invalid intent');
     }
+    /*
+    // Dispatch to your skill's intent handlers
+    if (intentName === 'MyColorIsIntent') {
+        setColorInSession(intent, session, callback);
+    } else if (intentName === 'WhatsMyColorIntent') {
+        getColorFromSession(intent, session, callback);
+    } else if (intentName === 'AMAZON.HelpIntent') {
+        getWelcomeResponse(callback);
+    } else if (intentName === 'AMAZON.StopIntent' || intentName === 'AMAZON.CancelIntent') {
+        handleSessionEndRequest(callback);
+    } else {
+        throw new Error('Invalid intent');
+    }
+    */
 }
 
 /**

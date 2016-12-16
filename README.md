@@ -6,4 +6,4 @@ A Holiday Card, from Matt to Kathy
 
 ## Getting Started 
 * Visit https://developer.amazon.com/edw/home.html#/skills to get started setting up the Alexa Skills Kit
-* To use the existing Lambda function, link the skill to the Lambda function, enter the following as the link to the lampda function: `arn:aws:lambda:us-east-1:709780463147:function:kathysHolidayCard` or `arn:aws:lambda:us-east-1:147065277893:function:kathysHolidayCard`
+* To use the existing Lambda function, link the skill to the Lambda function, enter the following as the link to the lampda function: `arn:aws:lambda:us-east-1:709780463147:function:kathysHolidayCard`.

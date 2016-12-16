@@ -10,8 +10,8 @@ AMAZON.NoIntent No he is not
 AMAZON.NoIntent He's not here
 
 
-AMAZON.YesIntent yes 
+AMAZON.YesIntent yes
 AMAZON.YesIntent yes i will
 AMAZON.YesIntent yes i do
-AMAZON.YesIntent I do 
+AMAZON.YesIntent I do
 AMAZON.YesIntent I will
