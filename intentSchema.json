@@ -1,0 +1,28 @@
+{
+    "intents": [
+        {
+            "intent": "ReadCardIntent",
+            "slots": [
+                {
+                    "name": "FirstName",
+                    "type": "AMAZON.US_FIRST_NAME"
+                }
+            ]
+        },
+        {
+            "intent": "AMAZON.HelpIntent"
+        },
+        {
+            "intent": "AMAZON.StopIntent"
+        },
+        {
+            "intent": "AMAZON.CancelIntent"
+        },
+        {
+            "intent": "AMAZON.YesIntent"
+        },
+        {
+            "intent": "AMAZON.NoIntent"
+        }
+    ]
+}

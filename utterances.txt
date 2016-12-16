@@ -1,0 +1,10 @@
+ReadCardIntent She's here
+ReadCardIntent I'm here
+ReadCardIntent Yes {FirstName} is here
+ReadCardIntent {FirstName} is here
+
+AMAZON.NoIntent She's not here
+AMAZON.NoIntent No
+AMAZON.NoIntent No she is not 
+AMAZON.NoIntent No he is not 
+AMAZON.NoIntent He's not here

@@ -1,0 +1,14 @@
+AMAZON.YesIntent Yes
+AMAZON.YesIntent I will
+AMAZON.YesIntent I do
+  
+AMAZON.NoIntent No
+
+AMAZON.CancelIntent Stop
+AMAZON.CancelIntent Cancel
+
+
+ReadCardIntent She's here
+ReadCardIntent I'm here
+ReadCardIntent Yes {FirstName} is here
+ReadCardIntent {FirstName} is here
