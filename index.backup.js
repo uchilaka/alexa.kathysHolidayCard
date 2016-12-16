@@ -44,15 +44,6 @@ function buildResponse(sessionAttributes, speechletResponse) {
 
 // --------------- Functions that control the skill's behavior -----------------------
 
-function getWaitingResponse(session, callback) {
-    const sessionAttributes = session.attributes;
-    const cardTitle = 'Waiting';
-    const speechOutput = "OK, please let me know when you're ready";
-    const repromptText = "I've still got Kathy's holiday card open. Let me know when we can get started.";
-    const shouldEndSession = false;
-    callback(sessionAttributes, buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
-}
-
 function getWelcomeResponse(callback) {
     // If we wanted to initialize the session to have some attributes we could add those here.
     const sessionAttributes = {};
@@ -69,28 +60,24 @@ function getWelcomeResponse(callback) {
 
 function readCard(session, callback) {
     const cardTitle = 'The Card';
-    var sessionAttributes = session.attributes;
-    const repromptText = 'Would you like to hear the card again?';
+    const repromptText = null;
     const shouldEndSession = false;
     const speechOutput = 'Kathy, you complete me. Will you marry me?';
-    sessionAttributes.proposalHeard = true;
-    callback(sessionAttributes, buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
+    session.proposalHeard = true;
+    callback(session, buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
 }
 
 function handleCardResponse(session, callback) {
     const cardTitle = 'The Response';
-    const sessionAttributes = session.attributes;
     const repromptText = "Kathy - would you like me to read Matt's card again?";
     const shouldEndSession = false;
     const speechOutput = "So... what do you think?";
-    callback(sessionAttributes, buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
+    callback(session, buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
 }
 
 function handleSessionEndRequest(session, callback) {
-    const cardTitle = 'Session Ended',
-        sessionAttributes = session.attributes
-        ;
-    const speechOutput = sessionAttributes.happyEnding ? 'Compliments of the Season, and Congratulations!!' : 'Goodbye';
+    const cardTitle = 'Session Ended';
+    const speechOutput = 'Compliments of the Season, and Congratulations!!';
     // Setting this to true ends the session and exits the skill.
     const shouldEndSession = true;
 
@@ -126,38 +113,16 @@ function onIntent(intentRequest, session, callback) {
 
     const intent = intentRequest.intent;
     const intentName = intentRequest.intent.name;
-    var attributes = session.attributes;
 
     switch (intentName) {
         case 'ReadCardIntent':
-            // set name, if provided 
-            var firstName = intent.slots.FirstName.value;
-            if (firstName && !/^he|she|they|we$/.test(firstName)) {
-                attributes.firstName = firstName;
-            }
             return readCard(session, callback);
 
         case 'AMAZON.HelpIntent':
             return getWelcomeResponse(callback);
 
-        case 'AMAZON.YesIntent':
-            if (attributes.proposalHeard) {
-                attributes.happyEnding = true;
-                handleSessionEndRequest(session, callback);
-            } else {
-                readCard(session, callback);
-            }
-            break;
-
+        case 'AMAZON.StopIntent':
         case 'AMAZON.NoIntent':
-            if (!attributes.proposalHeard) {
-                return getWaitingResponse(session, callback);
-            } else {
-                attributes.happyEnding = false;
-                return handleSessionEndRequest(session, callback);
-            }
-
-        case 'AMAZON.StopIntent':            
         case 'AMAZON.CancelIntent':
             return handleSessionEndRequest(session, callback);
 
