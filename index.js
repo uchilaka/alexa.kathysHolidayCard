@@ -135,10 +135,12 @@ function onIntent(intentRequest, session, callback) {
             if (firstName && !/^he|she|they|we$/.test(firstName)) {
                 attributes.firstName = firstName;
             }
-            return readCard(session, callback);
+            readCard(session, callback);
+            break;
 
         case 'AMAZON.HelpIntent':
-            return getWelcomeResponse(callback);
+            getWelcomeResponse(callback);
+            break;
 
         case 'AMAZON.YesIntent':
             if (attributes.proposalHeard) {
@@ -151,33 +153,21 @@ function onIntent(intentRequest, session, callback) {
 
         case 'AMAZON.NoIntent':
             if (!attributes.proposalHeard) {
-                return getWaitingResponse(session, callback);
+                getWaitingResponse(session, callback);
             } else {
                 attributes.happyEnding = false;
-                return handleSessionEndRequest(session, callback);
+                handleSessionEndRequest(session, callback);
             }
+            break;
 
         case 'AMAZON.StopIntent':            
         case 'AMAZON.CancelIntent':
-            return handleSessionEndRequest(session, callback);
+            handleSessionEndRequest(session, callback);
+            break;
 
         default:
             throw new Error('Invalid intent');
     }
-    /*
-    // Dispatch to your skill's intent handlers
-    if (intentName === 'MyColorIsIntent') {
-        setColorInSession(intent, session, callback);
-    } else if (intentName === 'WhatsMyColorIntent') {
-        getColorFromSession(intent, session, callback);
-    } else if (intentName === 'AMAZON.HelpIntent') {
-        getWelcomeResponse(callback);
-    } else if (intentName === 'AMAZON.StopIntent' || intentName === 'AMAZON.CancelIntent') {
-        handleSessionEndRequest(callback);
-    } else {
-        throw new Error('Invalid intent');
-    }
-    */
 }
 
 /**
